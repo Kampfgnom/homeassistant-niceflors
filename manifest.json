@@ -1,0 +1,18 @@
+{
+  "domain": "nice_flor_s",
+  "name": "Nice Flor-S Covers",
+  "version": "0.0.1",
+  "codeowners": [
+    "@Kampfgnom"
+  ],
+  "config_flow": false,
+  "dependencies": [],
+  "documentation": "https://www.home-assistant.io/integrations/nice_flor_s",
+  "homekit": {},
+  "iot_class": "assumed_state",
+  "requirements": [
+    "pigpio==1.78"
+  ],
+  "ssdp": [],
+  "zeroconf": []
+}

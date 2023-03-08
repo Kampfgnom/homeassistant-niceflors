@@ -1,0 +1,8 @@
+pair:
+  name: Pair
+  description: Start pairing with a given serial.
+  fields:
+    serial:
+      name: Serial
+      description: The target serial for which pairing should be started.
+      example: 0x2031234
