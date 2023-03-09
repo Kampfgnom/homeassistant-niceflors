@@ -30,6 +30,7 @@ from .encode_tables import (
     NICE_FLOR_S_TABLE_ENCODE,
     NICE_FLOR_S_TABLE_KI,
 )
+from threading import Lock
 from .const import (
     DOMAIN,
     CONF_SERIAL,
@@ -145,7 +146,7 @@ class RFDevice:
         self.tx_pulse_short = 500
         self.tx_pulse_long = 1000
         self.tx_pulse_sync = 1500
-        self.tx_pulse_gap = 2000
+        self.tx_pulse_gap = 15000
         self.tx_length = 52
 
     def tx_code(self, code: int):
@@ -160,13 +161,11 @@ class RFDevice:
         wf.extend(self.tx_sync())
         wf.extend(self.tx_gap())
 
-        while self._pi.wave_tx_busy():
-            pass
-
         self._pi.wave_clear()
         self._pi.wave_add_generic(wf)
         wave = self._pi.wave_create()
         self._pi.wave_send_once(wave)
+        self._pi.wave_delete(wave)
 
     def tx_l0(self):
         return [
@@ -206,6 +205,7 @@ class NiceHub:
     ) -> None:
         self._gpio = gpio
         self._next_code = next_code
+        self._lock = Lock()
 
         self._pi = pigpio.pi(pigpio_host)
 
@@ -216,30 +216,39 @@ class NiceHub:
         self._rfdevice = rfdevice
 
     def cleanup(self):
-        self._pi.stop()
+        with self._lock:
+            self._pi.stop()
 
     def pair(self, service_call: ServiceCall):
-        serial = service_call.data[CONF_SERIAL]
-        _LOGGER.info("Starting pairing of %s", hex(serial))
-        for _ in range(1, 10):
+        with self._lock:
+            _LOGGER.info("Starting pairing of %s... Wait 5 seconds.", hex(serial))
+
             button_id = BUTTON_ID_STOP
-            for repeat in range(1, 7):
-                tx_code = self._nice_flor_s_encode(
-                    serial, int(self._next_code.native_value), button_id, repeat
-                )
-                _LOGGER.info("tx_code %s", hex(tx_code))
-                self._rfdevice.tx_code(tx_code)
-        _LOGGER.info("Pairing of %s started.", hex(serial))
+            code = int(self._next_code.native_value)
+            serial = service_call.data[CONF_SERIAL]
+
+            for _ in range(1, 10):
+                self._send_repeated(serial, button_id, code)
+
+            _LOGGER.info("Entered pairing mode for %s.", hex(serial))
 
     def send(self, serial: int, button_id: int):
-        for repeat in range(1, 7):
-            tx_code = self._nice_flor_s_encode(
-                serial, int(self._next_code.native_value), button_id, repeat
-            )
-            _LOGGER.info("tx_code %s", hex(tx_code))
-            self._rfdevice.tx_code(tx_code)
-
+        code = int(self._next_code.native_value)
+        self._send_repeated(serial, button_id, code)
         self._next_code.increase()
+
+    def _send_repeated(self, serial: int, button_id: int, code: int):
+        with self._lock:
+            for repeat in range(1, 7):
+                tx_code = self._nice_flor_s_encode(serial, code, button_id, repeat)
+                _LOGGER.info(
+                    "serial %s, button_id %i, code %i, tx_code %s",
+                    hex(serial),
+                    button_id,
+                    code,
+                    hex(tx_code),
+                )
+                self._rfdevice.tx_code(tx_code)
 
     def _nice_flor_s_encode(
         self, serial: int, code: int, button_id: int, repeat: int
