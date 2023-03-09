@@ -93,9 +93,8 @@ def setup_platform(
         devices.append(
             NiceCover(
                 hub=hub,
-                name=properties.get(CONF_NAME, dev_name),
                 friendly_name=properties.get(CONF_FRIENDLY_NAME),
-                unique_id=properties.get(CONF_UNIQUE_ID),
+                unique_id=properties.get(CONF_NAME, dev_name),
                 serial=properties.get(CONF_SERIAL),
             )
         )
@@ -289,11 +288,11 @@ class NiceCover(CoverEntity):
     def __init__(
         self,
         hub: NiceHub,
-        name: str,
         friendly_name: str,
         unique_id: str,
         serial: int,
     ):
+        super().__init__()
         self._hub = hub
         self._serial = serial
 
