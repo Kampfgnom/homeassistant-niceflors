@@ -160,6 +160,9 @@ class RFDevice:
         wf.extend(self.tx_sync())
         wf.extend(self.tx_gap())
 
+        while self._pi.wave_tx_busy():
+            pass
+
         self._pi.wave_clear()
         self._pi.wave_add_generic(wf)
         wave = self._pi.wave_create()
@@ -237,21 +240,21 @@ class NiceHub:
 
     def send(self, serial: int, button_id: int):
         code = int(self._next_code.native_value)
-        self._send_repeated(serial, button_id, code)
+        with self._lock:
+            self._send_repeated(serial, button_id, code)
         self._next_code.increase()
 
     def _send_repeated(self, serial: int, button_id: int, code: int):
-        with self._lock:
-            for repeat in range(1, 7):
-                tx_code = self._nice_flor_s_encode(serial, code, button_id, repeat)
-                _LOGGER.info(
-                    "serial %s, button_id %i, code %i, tx_code %s",
-                    hex(serial),
-                    button_id,
-                    code,
-                    hex(tx_code),
-                )
-                self._rfdevice.tx_code(tx_code)
+        for repeat in range(1, 7):
+            tx_code = self._nice_flor_s_encode(serial, code, button_id, repeat)
+            _LOGGER.info(
+                "serial %s, button_id %i, code %i, tx_code %s",
+                hex(serial),
+                button_id,
+                code,
+                hex(tx_code),
+            )
+            self._rfdevice.tx_code(tx_code)
 
     def _nice_flor_s_encode(
         self, serial: int, code: int, button_id: int, repeat: int
