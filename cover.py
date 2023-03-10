@@ -224,11 +224,11 @@ class NiceHub:
 
     def pair(self, service_call: ServiceCall):
         with self._lock:
-            _LOGGER.info("Starting pairing of %s... Wait 5 seconds.", hex(serial))
-
             button_id = BUTTON_ID_STOP
             code = int(self._next_code.native_value)
             serial = service_call.data[CONF_SERIAL]
+
+            _LOGGER.info("Starting pairing of %s... Wait 5 seconds.", hex(serial))
 
             for _ in range(1, 10):
                 self._send_repeated(serial, button_id, code)
