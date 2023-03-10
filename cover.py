@@ -145,7 +145,7 @@ class RFDevice:
         self.tx_pulse_short = 500
         self.tx_pulse_long = 1000
         self.tx_pulse_sync = 1500
-        self.tx_pulse_gap = 15000
+        self.tx_pulse_gap = 2000
         self.tx_length = 52
 
     def tx_code(self, code: int):
@@ -164,6 +164,10 @@ class RFDevice:
         self._pi.wave_add_generic(wf)
         wave = self._pi.wave_create()
         self._pi.wave_send_once(wave)
+
+        while self._pi.wave_tx_busy():
+            pass
+
         self._pi.wave_delete(wave)
 
     def tx_l0(self):
