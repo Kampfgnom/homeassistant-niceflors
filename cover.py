@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import logging
 import pigpio
+import time
 
 import voluptuous as vol
 
@@ -161,7 +162,7 @@ class RFDevice:
         wf.extend(self.tx_gap())
 
         while self._pi.wave_tx_busy():
-            pass
+            time.sleep(0.1)
 
         self._pi.wave_clear()
         self._pi.wave_add_generic(wf)
@@ -169,7 +170,7 @@ class RFDevice:
         self._pi.wave_send_once(wave)
 
         while self._pi.wave_tx_busy():
-            pass
+            time.sleep(0.1)
 
         self._pi.wave_delete(wave)
 
@@ -214,6 +215,7 @@ class NiceHub:
         self._lock = Lock()
 
         self._pi = pigpio.pi(pigpio_host)
+        self._pi.set_mode(gpio, pigpio.OUTPUT)
 
         if not self._pi.connected:
             raise PigpioNotConnected()
