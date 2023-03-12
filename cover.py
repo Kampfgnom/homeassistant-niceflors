@@ -245,7 +245,7 @@ class NiceHub:
             code = int(self._next_code.native_value)
             self._send_repeated(serial, button_id, code)
             self._next_code.increase()
-            time.sleep(0.1)
+            time.sleep(0.5)
 
     def _send_repeated(self, serial: int, button_id: int, code: int):
         for repeat in range(1, 7):
