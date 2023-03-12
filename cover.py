@@ -241,11 +241,11 @@ class NiceHub:
             _LOGGER.info("Entered pairing mode for %s.", hex(serial))
 
     def send(self, serial: int, button_id: int):
-        code = int(self._next_code.native_value)
         with self._lock:
+            code = int(self._next_code.native_value)
             self._send_repeated(serial, button_id, code)
+            self._next_code.increase()
             time.sleep(0.1)
-        self._next_code.increase()
 
     def _send_repeated(self, serial: int, button_id: int, code: int):
         for repeat in range(1, 7):
