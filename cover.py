@@ -146,7 +146,7 @@ class RFDevice:
         self.tx_pulse_short = 500
         self.tx_pulse_long = 1000
         self.tx_pulse_sync = 1500
-        self.tx_pulse_gap = 2000
+        self.tx_pulse_gap = 15000
         self.tx_length = 52
 
     def tx_code(self, code: int):
@@ -244,6 +244,7 @@ class NiceHub:
         code = int(self._next_code.native_value)
         with self._lock:
             self._send_repeated(serial, button_id, code)
+            time.sleep(0.1)
         self._next_code.increase()
 
     def _send_repeated(self, serial: int, button_id: int, code: int):
