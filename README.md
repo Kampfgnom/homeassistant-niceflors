@@ -1,5 +1,5 @@
 <img src="https://www.home-assistant.io/images/home-assistant-logo.svg" alt="Home Assistant" width="200"/><br>
-Nice Flor-SThis integration allows you to control Nice Flor-S shutters with a Raspberry Pi and a 433 MHz transmitter.
+This integration allows you to control Nice Flor-S shutters with a Raspberry Pi and a 433 MHz transmitter.
 
 ## Installation 
 1. Install the [pigpio addon](https://community.home-assistant.io/t/pigpio-addon/314734) to your Home Assistant instance.
