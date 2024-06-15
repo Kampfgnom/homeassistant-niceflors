@@ -8,10 +8,8 @@ import voluptuous as vol
 
 from homeassistant.components.cover import (
     PLATFORM_SCHEMA,
-    SUPPORT_CLOSE,
-    SUPPORT_OPEN,
-    SUPPORT_STOP,
     CoverEntity,
+    CoverEntityFeature,
 )
 from homeassistant.components.number import RestoreNumber
 from homeassistant.const import (
@@ -143,10 +141,10 @@ class RFDevice:
     ) -> None:
         self._pi = pi
         self._gpio = gpio
-        self.tx_pulse_short = 500
-        self.tx_pulse_long = 1000
-        self.tx_pulse_sync = 1500
-        self.tx_pulse_gap = 15000
+        self.tx_pulse_short = 250  # Halved values (x2 them if your remote does not work)
+        self.tx_pulse_long = 500   # Halved values (x2 them if your remote does not work)
+        self.tx_pulse_sync = 750   # Halved values (x2 them if your remote does not work)
+        self.tx_pulse_gap = 7500   # Halved values (x2 them if your remote does not work)
         self.tx_length = 52
 
     def tx_code(self, code: int):
@@ -168,6 +166,16 @@ class RFDevice:
         self._pi.wave_add_generic(wf)
         wave = self._pi.wave_create()
         self._pi.wave_send_once(wave)
+
+        #for i in range(0, len(wf)):
+        #    _LOGGER.info(
+        #        "waveform %i: %i %i %i",
+        #        i,
+        #        wf[i].gpio_on,
+        #        wf[i].gpio_off,
+        #        wf[i].delay,
+        #    )
+
 
         while self._pi.wave_tx_busy():
             time.sleep(0.1)
@@ -215,10 +223,16 @@ class NiceHub:
         self._lock = Lock()
 
         self._pi = pigpio.pi(pigpio_host)
-        self._pi.set_mode(gpio, pigpio.OUTPUT)
+        _LOGGER.info("Connecting to pigpio on %s, please wait...", pigpio_host)
 
-        if not self._pi.connected:
-            raise PigpioNotConnected()
+        i = 0
+        while not self._pi.connected:
+            i += 1
+            _LOGGER.info("...")
+            time.sleep(1)
+            if i > 9:
+                raise PigpioNotConnected()
+        self._pi.set_mode(gpio, pigpio.OUTPUT)
 
         rfdevice = RFDevice(gpio=1 << gpio, pi=self._pi)
         self._rfdevice = rfdevice
@@ -309,7 +323,7 @@ class NiceCover(CoverEntity):
         self._attr_assumed_state = True
         self._attr_name = friendly_name
         self._attr_unique_id = unique_id
-        self._attr_supported_features = SUPPORT_OPEN | SUPPORT_CLOSE | SUPPORT_STOP
+        self._attr_supported_features = CoverEntityFeature.OPEN | CoverEntityFeature.CLOSE | CoverEntityFeature.STOP
         self._attr_device_class = DEVICE_CLASS
         self._attr_current_cover_position = 50
         self._attr_is_closed = False
