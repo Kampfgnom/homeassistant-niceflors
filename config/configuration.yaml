@@ -1,0 +1,10 @@
+#Add this to your /config/configuration.yaml
+cover:
+  - platform: nice_flor_s
+    pigpio_host: localhost
+    gpio: 17
+    start_code: 0
+    covers:
+      cover1:
+        serial: YOUR_SERIAL
+        friendly_name: "COVER_NAME"
