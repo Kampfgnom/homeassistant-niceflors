@@ -25,6 +25,7 @@ This integration allows you to control Nice Flor-S shutters with a Raspberry Pi 
 To pair a shutter, call the service `nice_flor_s.pair` with the serial number of the shutter you want to pair.
 The shutter will enter pairing mode for 5 seconds. During this time, press the button on the shutter to pair it.
 ## Troubleshooting
+- If the timings are incorrect, double them (check cover.py)
 - Make sure that the pigpio addon is installed and running
 - Make sure that the GPIO pin is correctly configured
 - Make sure that the transmitter is correctly connected to the GPIO pin
