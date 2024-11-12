@@ -171,16 +171,6 @@ class RFDevice:
         wave = self._pi.wave_create()
         self._pi.wave_send_once(wave)
 
-        #for i in range(0, len(wf)):
-        #    _LOGGER.info(
-        #        "waveform %i: %i %i %i",
-        #        i,
-        #        wf[i].gpio_on,
-        #        wf[i].gpio_off,
-        #        wf[i].delay,
-        #    )
-
-
         while self._pi.wave_tx_busy():
             time.sleep(0.1)
 
@@ -327,7 +317,9 @@ class NiceCover(CoverEntity):
         self._attr_assumed_state = True
         self._attr_name = friendly_name
         self._attr_unique_id = unique_id
-        self._attr_supported_features = CoverEntityFeature.OPEN | CoverEntityFeature.CLOSE | CoverEntityFeature.STOP
+        self._attr_supported_features = (
+            CoverEntityFeature.OPEN | CoverEntityFeature.CLOSE | CoverEntityFeature.STOP
+        )
         self._attr_device_class = DEVICE_CLASS
         self._attr_current_cover_position = 50
         self._attr_is_closed = False
