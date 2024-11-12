@@ -2,12 +2,12 @@
 This integration allows you to control Nice Flor-S shutters with a Raspberry Pi and a 433 MHz transmitter.
 
 ## Installation 
-1. Install the [pigpio addon](https://community.home-assistant.io/t/pigpio-addon/314734) to your Home Assistant instance.
+1. Install the [pigpio addon](https://github.com/Poeschl-HomeAssistant-Addons/repository/tree/main/pigpio) to your Home Assistant instance.
 2. Install a file manager addon
 3. Create a new directory in `/config` called `custom_components`
 4. Create a new directory in `/config/custom_components` called `nice_flor_s`
 5. Copy the contents of this repository to `/config/custom_components/nice_flor_s` except for the `configurations` directory
-6. Configure the integration in your `configuration.yaml` file (see below)
+6. Configure the integration in your `/config/configuration.yaml` file (see below)
 7. Restart Home Assistant
 8. Pair your shutters by calling the service `nice_flor_s.pair` with the serial number of the shutter you want to pair
 9. Use the Home Assistant UI to control your shutters (You can add the CoverEntity to your Lovelace dashboard)
