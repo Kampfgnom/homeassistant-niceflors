@@ -8,10 +8,8 @@ import voluptuous as vol
 
 from homeassistant.components.cover import (
     PLATFORM_SCHEMA,
-    SUPPORT_CLOSE,
-    SUPPORT_OPEN,
-    SUPPORT_STOP,
     CoverEntity,
+    CoverEntityFeature,
 )
 from homeassistant.components.number import RestoreNumber
 from homeassistant.const import (
@@ -309,7 +307,9 @@ class NiceCover(CoverEntity):
         self._attr_assumed_state = True
         self._attr_name = friendly_name
         self._attr_unique_id = unique_id
-        self._attr_supported_features = SUPPORT_OPEN | SUPPORT_CLOSE | SUPPORT_STOP
+        self._attr_supported_features = (
+            CoverEntityFeature.OPEN | CoverEntityFeature.CLOSE | CoverEntityFeature.STOP
+        )
         self._attr_device_class = DEVICE_CLASS
         self._attr_current_cover_position = 50
         self._attr_is_closed = False
