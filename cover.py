@@ -141,6 +141,10 @@ class RFDevice:
     ) -> None:
         self._pi = pi
         self._gpio = gpio
+        #self.tx_pulse_short = 250  # Halved values
+        #self.tx_pulse_long = 500   # Halved values
+        #self.tx_pulse_sync = 750   # Halved values
+        #self.tx_pulse_gap = 7500   # Halved values
         self.tx_pulse_short = 500
         self.tx_pulse_long = 1000
         self.tx_pulse_sync = 1500
@@ -213,10 +217,16 @@ class NiceHub:
         self._lock = Lock()
 
         self._pi = pigpio.pi(pigpio_host)
-        self._pi.set_mode(gpio, pigpio.OUTPUT)
+        _LOGGER.info("Connecting to pigpio on %s, please wait...", pigpio_host)
 
-        if not self._pi.connected:
-            raise PigpioNotConnected()
+        i = 0
+        while not self._pi.connected:
+            i += 1
+            _LOGGER.info("...")
+            time.sleep(1)
+            if i > 9:
+                raise PigpioNotConnected()
+        self._pi.set_mode(gpio, pigpio.OUTPUT)
 
         rfdevice = RFDevice(gpio=1 << gpio, pi=self._pi)
         self._rfdevice = rfdevice
@@ -324,3 +334,4 @@ class NiceCover(CoverEntity):
 
     def stop_cover(self, **kwargs) -> None:
         self._hub.send(self._serial, BUTTON_ID_STOP)
+
